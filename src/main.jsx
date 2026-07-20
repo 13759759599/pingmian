@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
 
@@ -57,7 +57,7 @@ function Meta({ project }) {
   </div>
 }
 
-function ProjectChapter({ id, chapter, project, layout = 'editorial', onImage }) {
+function ProjectChapter({ id, chapter, project, layout = 'editorial', onImage, children }) {
   return <section id={id} className={'chapter projectChapter ' + layout} data-theme={chapter.theme}>
     <div className="chapterHeading reveal">
       <p className="eyebrow">{chapter.index} / {chapter.label}</p>
@@ -81,6 +81,73 @@ function ProjectChapter({ id, chapter, project, layout = 'editorial', onImage })
         </button>)}
       </div>
     </div>
+    {children}
+  </section>
+}
+
+function SunsetReel() {
+  const reelRef = useRef(null)
+
+  useEffect(() => {
+    const root = reelRef.current
+    if (!root) return undefined
+    const videos = Array.from(root.querySelectorAll('video'))
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const video = entry.target
+        if (entry.isIntersecting) {
+          video.play().catch(() => {})
+        } else {
+          video.pause()
+        }
+      })
+    }, { threshold: 0.46 })
+    videos.forEach(video => observer.observe(video))
+    return () => observer.disconnect()
+  }, [])
+
+  return <section className="sunsetReel reveal" ref={reelRef}>
+    <header className="sunsetReelIntro reveal">
+      <span>01.5 / AFTERGLOW REEL</span>
+    </header>
+
+    <article className="sunsetReelScene sceneOne">
+      <div className="sunsetType sunsetTypeLeft reveal" aria-hidden="true">
+        <small>CITY OF</small><b>SUNSET</b><i>余晖 / 驾驶 / 音乐</i>
+      </div>
+      <div className="sunsetReelFrame reveal">
+        <div className="sunsetVideoTitle">
+          <b>日落之后</b>
+          <small>DRIVE INTO THE AFTERGLOW</small>
+        </div>
+        <video src={A + 'sunset-reel-01.mp4'} muted loop playsInline preload="metadata" aria-label="落日之城界面动态视频一" />
+        <span>SCROLL TO PLAY · MUTED FILM</span>
+      </div>
+      <div className="sunsetType sunsetTypeRight reveal" aria-hidden="true">
+        <small>DRIVE INTO</small><small>THE AFTERGLOW</small><i>落日 / 余温 / 行驶</i>
+      </div>
+    </article>
+
+    <article className="sunsetReelScene sceneTwo">
+      <div className="sunsetType sunsetTypeLeft reveal" aria-hidden="true">
+        <small>Q MUSIC IDEAS</small><small>QQ音乐 · 车载皮肤设计</small><i>IN-CAR MUSIC SKIN / 2025</i>
+      </div>
+      <div className="sunsetReelFrame reveal">
+        <div className="sunsetVideoTitle">
+          <b>声景流动</b>
+          <small>IN-CAR MUSIC SKIN / 2025</small>
+        </div>
+        <video src={A + 'sunset-reel-02.mp4'} muted loop playsInline preload="metadata" aria-label="落日之城界面动态视频二" />
+        <span>02 / DIGITAL SUNSET</span>
+      </div>
+      <div className="sunsetType sunsetTypeRight reveal" aria-hidden="true">
+        <b>让音乐<br />驶过城市</b><small>LISTEN / MOVE / DUSK</small>
+      </div>
+    </article>
+
+    <footer className="sunsetReelOutro reveal">
+      <span>THE SUN GOES DOWN</span><i></i><b>余晖停在交互的最后一帧</b>
+    </footer>
   </section>
 }
 
@@ -211,7 +278,9 @@ function App() {
         </div>
       </section>
 
-      <ProjectChapter id="music" chapter={chapters[1]} project={projects.music} layout="cinema" onImage={openImage} />
+      <ProjectChapter id="music" chapter={chapters[1]} project={projects.music} layout="cinema" onImage={openImage}>
+        <SunsetReel />
+      </ProjectChapter>
       <ProjectChapter id="msi" chapter={chapters[2]} project={projects.msi} layout="campaign" onImage={openImage} />
       <AdmissionChapter onImage={openImage} />
       <ProjectChapter id="lamp" chapter={chapters[4]} project={projects.lamp} layout="warm" onImage={openImage} />
